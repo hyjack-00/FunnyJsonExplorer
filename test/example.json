@@ -1,0 +1,12 @@
+{
+    "oranges": {
+        "mandarin": {
+            "clementine": null,
+            "tangerine": "cheap & juicy!"
+        }
+    },
+    "apples": {
+        "gala": null,
+        "pink lady": null
+    }
+}

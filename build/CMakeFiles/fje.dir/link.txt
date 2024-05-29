@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/c++  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk -mmacosx-version-min=13.5 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/fje.dir/src/JsonTree.cpp.o CMakeFiles/fje.dir/src/main.cpp.o -o /Users/hyjack/workspace/SE/FunnyJsonExplorer/bin/fje 

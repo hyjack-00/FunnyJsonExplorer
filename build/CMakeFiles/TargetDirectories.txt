@@ -1,0 +1,3 @@
+/Users/hyjack/workspace/SE/FunnyJsonExplorer/build/CMakeFiles/fje.dir
+/Users/hyjack/workspace/SE/FunnyJsonExplorer/build/CMakeFiles/edit_cache.dir
+/Users/hyjack/workspace/SE/FunnyJsonExplorer/build/CMakeFiles/rebuild_cache.dir
