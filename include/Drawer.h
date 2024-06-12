@@ -27,16 +27,16 @@ protected:
     int indentLen;
 
 public:
-    // TODO 删除默认构造函数，使用工厂方法
-    Drawer() : linkLen(2), iconLen(1) {
-        indentLen = linkLen + iconLen;
-        defaultIcon = leafIcon = ContainerIcon = " ";
-        branch      = "  ";
-        vertical    = "  ";
-        branchEnd   = "  ";
-        verticalEnd = "  ";
-        reset();
-    }
+    // // TODO 删除默认构造函数，使用工厂方法
+    // Drawer() : linkLen(2), iconLen(1) {
+    //     indentLen = linkLen + iconLen;
+    //     defaultIcon = leafIcon = ContainerIcon = " ";
+    //     branch      = "  ";
+    //     vertical    = "  ";
+    //     branchEnd   = "  ";
+    //     verticalEnd = "  ";
+    //     reset();
+    // }
 
     virtual ~Drawer() = default;
 
@@ -55,13 +55,13 @@ class TreeDrawer : public Drawer {
 private:
 
 public:
-    // TODO 删除默认构造函数，使用工厂方法
-    TreeDrawer() : Drawer() {
-        branch      = "├─";
-        vertical    = "│ ";
-        branchEnd   = "└─";
-        verticalEnd = "  ";
-    }
+    // // TODO 删除默认构造函数，使用工厂方法
+    // TreeDrawer() : Drawer() {
+    //     branch      = "├─";
+    //     vertical    = "│ ";
+    //     branchEnd   = "└─";
+    //     verticalEnd = "  ";
+    // }
 
     void drawDecorate() override;
 };
@@ -70,13 +70,13 @@ class RectDrawer : public Drawer {
 private:
 
 public:
-    // TODO 删除默认构造函数，使用工厂方法
-    RectDrawer() : Drawer() {
-        branch      = "├─";
-        vertical    = "│ ";
-        branchEnd   = "├─";
-        verticalEnd = "│ ";
-    }
+    // // TODO 删除默认构造函数，使用工厂方法
+    // RectDrawer() : Drawer() {
+    //     branch      = "├─";
+    //     vertical    = "│ ";
+    //     branchEnd   = "├─";
+    //     verticalEnd = "│ ";
+    // }
 
     void drawNode(
         const std::shared_ptr<JsonNode>& jsonNode, 
