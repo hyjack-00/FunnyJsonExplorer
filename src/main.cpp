@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "JsonTree.h"
+#include "Drawer.h"
 
 // test
 void printJsonTree(const std::shared_ptr<JsonNode>& node, int indent = 0) {
@@ -34,6 +35,21 @@ int main(int argc, char* argv[]) {
 
     std::shared_ptr<JsonNode> root = jsonTree.getRoot();
     printJsonTree(root);
+
+    std::cout << "DefaultDrawer:" << std::endl;
+    Drawer drawer;
+    auto output0 = drawer.getOutput(root);
+    output0->print();
+
+    std::cout << "TreeDrawer:" << std::endl;
+    TreeDrawer treeDrawer;
+    auto output1 = treeDrawer.getOutput(root);
+    output1->print();
+
+    std::cout << "RectDrawer:" << std::endl;
+    RectDrawer rectDrawer;
+    auto output2 = rectDrawer.getOutput(root);
+    output2->print();
 
     return 0;
 }
