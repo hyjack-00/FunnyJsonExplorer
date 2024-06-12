@@ -1,11 +1,17 @@
 #include <iostream>
+#include <string>
+#include <vector>
+#include <stdexcept>
+#include <cxxopts/cxxopts.hpp> 
 
 #include "JsonTree.h"
 #include "Output.h"
 #include "Drawer.h"
 #include "DrawerFactory.h"
 
-// test
+DrawerFactoryRegistry registry;
+
+// Function to print the JSON tree structure
 void printJsonTree(const std::shared_ptr<JsonNode>& node, int indent = 0) {
     if (!node) return;
 
@@ -20,14 +26,30 @@ void printJsonTree(const std::shared_ptr<JsonNode>& node, int indent = 0) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <json file>" << std::endl;
+    // Parse command-line arguments
+    cxxopts::Options options("FJE", "A command-line JSON file visualization tool");
+    options.add_options()
+        ("f,file", "JSON file path", cxxopts::value<std::string>())
+        ("s,style", "Style of visualization (tree/rect)", cxxopts::value<std::string>()->default_value("tree"))
+        ("i,icon", "Icon family to use", cxxopts::value<std::string>()->default_value("default"))
+        ("c,config", "Configuration file path (required if -i config is used)", cxxopts::value<std::string>())
+        ("h,help", "Print usage");
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help")) {
+        std::cout << options.help() << std::endl;
+        return 0;
+    }
+    if (!result.count("file")) {
+        std::cerr << "Error: JSON file path not provided." << std::endl;
         return 1;
     }
 
-    std::string filename = argv[1];
-    JsonTree jsonTree;
+    std::string filename = result["file"].as<std::string>();
+    std::string style = result["style"].as<std::string>();
+    std::string iconFamily = result["icon"].as<std::string>();
 
+    JsonTree jsonTree;
     try {
         jsonTree.readJson(filename);
     } catch (const std::exception& e) {
@@ -35,59 +57,25 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::shared_ptr<JsonNode> root = jsonTree.getRoot();
-    printJsonTree(root);
+    // build drawer
+    auto factory = registry.getFactory(iconFamily);
+    if (iconFamily == "config") {
+        if (!result.count("config")) {
+            std::cerr << "Error: Configuration file path must be provided when using -i config." << std::endl;
+            return 1;
+        }
+        std::string configFilePath = result["config"].as<std::string>();
 
-    // std::cout << "DefaultDrawer:" << std::endl;
-    // Drawer drawer;
-    // auto output0 = drawer.getOutput(root);
-    // output0->print();
+        auto configFactory = std::dynamic_pointer_cast<ConfigDrawerFactory>(factory);
+        configFactory->loadConfigFile(configFilePath);
+    }
 
-    // std::cout << "TreeDrawer:" << std::endl;
-    // TreeDrawer treeDrawer;
-    // auto output1 = treeDrawer.getOutput(root);
-    // output1->print();
+    auto drawer = factory->createDrawer(style);
 
-    DrawerFactory drawerFactory;
-    std::cout << "TreeDrawer:" << std::endl;
-    auto treeDrawer = drawerFactory.createTreeDrawer();
-    auto output0 = treeDrawer->getOutput(root);
-    output0->print();
-
-    // std::cout << "RectDrawer:" << std::endl;
-    // RectDrawer rectDrawer;
-    // auto output2 = rectDrawer.getOutput(root);
-    // output2->print();
-
-    std::cout << "RectDrawer:" << std::endl;
-    auto rectDrawer = drawerFactory.createRectDrawer();
-    auto output1 = rectDrawer->getOutput(root);
-    output1->print();
-
-
-    PokerDrawerFactory pokerDrawerFactory;
-    std::cout << "PokerTreeDrawer:" << std::endl;
-    auto pokerTreeDrawer = pokerDrawerFactory.createTreeDrawer();
-    auto output2 = pokerTreeDrawer->getOutput(root);
-    output2->print();
-
-    std::cout << "PokerRectDrawer:" << std::endl;
-    auto pokerRectDrawer = pokerDrawerFactory.createRectDrawer();
-    auto output3 = pokerRectDrawer->getOutput(root);
-    output3->print();
-
-
-    ConfigDrawerFactory configDrawerFactory("../test/exampleIcon.conf");
-    std::cout << "ConfigTreeDrawer:" << std::endl;
-    auto configTreeDrawer = configDrawerFactory.createTreeDrawer();
-    auto output4 = configTreeDrawer->getOutput(root);
-    output4->print();
-
-    std::cout << "ConfigRectDrawer:" << std::endl;
-    auto configRectDrawer = configDrawerFactory.createRectDrawer();
-    auto output5 = configRectDrawer->getOutput(root);
-    output5->print();
-
+    // build output
+    auto root = jsonTree.getRoot();
+    auto output = drawer->getOutput(root);
+    output->print();
 
     return 0;
 }

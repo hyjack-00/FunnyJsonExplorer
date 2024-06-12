@@ -55,11 +55,33 @@ std::unique_ptr<Drawer> DrawerFactory::createRectDrawer() {
 
     return std::move(drawer);   
 }
+std::unique_ptr<Drawer> DrawerFactory::createDrawer(DrawerType drawerType) {
+    switch (drawerType) {
+    case DrawerType::DefaultStyle:
+        return std::make_unique<Drawer>();
+    case DrawerType::TreeStyle:
+        return std::move(createTreeDrawer());
+    case DrawerType::RectStyle:
+        return std::move(createRectDrawer());
+    default:
+        return nullptr;
+    }
+}
+std::unique_ptr<Drawer> DrawerFactory::createDrawer(const std::string& drawerTypeName) {
+    static std::map<std::string, DrawerType> drawerTypeMap = {
+        {"default", DrawerType::DefaultStyle},
+        {"tree", DrawerType::TreeStyle},
+        {"rect", DrawerType::RectStyle}
+    };
+    return std::move(createDrawer(drawerTypeMap[drawerTypeName]));
+}
 
 
-ConfigDrawerFactory::ConfigDrawerFactory(const std::string& configFilePath) 
-    : configFilePath(configFilePath) 
-{
+ConfigDrawerFactory::ConfigDrawerFactory(const std::string& configFilePath) {
+    loadConfigFile(configFilePath);
+}
+void ConfigDrawerFactory::loadConfigFile(const std::string& configFilePath) {
+    this->configFilePath = configFilePath; 
     std::ifstream configFile(configFilePath);
     if (!configFile) {
         std::cerr << "Failed to open config file: " << configFilePath << std::endl;
@@ -80,4 +102,17 @@ ConfigDrawerFactory::ConfigDrawerFactory(const std::string& configFilePath)
             }
         }
     }
+}
+
+
+std::shared_ptr<DrawerFactory> DrawerFactoryRegistry::getFactory(FactoryType factoryType) {
+    auto it = factoryMap.find(factoryType);
+    if (it != factoryMap.end()) {
+        return it->second;
+    } else {
+        return nullptr;
+    }
+}
+std::shared_ptr<DrawerFactory> DrawerFactoryRegistry::getFactory(const std::string& factoryName) {
+    return getFactory(factoryNameMap[factoryName]);
 }

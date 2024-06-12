@@ -4,6 +4,11 @@
 #include "JsonTree.h"
 #include "Output.h"
 
+enum DrawerType {
+    DefaultStyle,
+    TreeStyle,
+    RectStyle
+};
 class Drawer {
 friend class DrawerFactory;
 
@@ -27,17 +32,7 @@ protected:
     int indentLen;
 
 public:
-    // // TODO 删除默认构造函数，使用工厂方法
-    // Drawer() : linkLen(2), iconLen(1) {
-    //     indentLen = linkLen + iconLen;
-    //     defaultIcon = leafIcon = ContainerIcon = " ";
-    //     branch      = "  ";
-    //     vertical    = "  ";
-    //     branchEnd   = "  ";
-    //     verticalEnd = "  ";
-    //     reset();
-    // }
-
+    Drawer() = default;
     virtual ~Drawer() = default;
 
     void reset();
@@ -55,13 +50,7 @@ class TreeDrawer : public Drawer {
 private:
 
 public:
-    // // TODO 删除默认构造函数，使用工厂方法
-    // TreeDrawer() : Drawer() {
-    //     branch      = "├─";
-    //     vertical    = "│ ";
-    //     branchEnd   = "└─";
-    //     verticalEnd = "  ";
-    // }
+    TreeDrawer() = default;
 
     void drawDecorate() override;
 };
@@ -70,19 +59,14 @@ class RectDrawer : public Drawer {
 private:
 
 public:
-    // // TODO 删除默认构造函数，使用工厂方法
-    // RectDrawer() : Drawer() {
-    //     branch      = "├─";
-    //     vertical    = "│ ";
-    //     branchEnd   = "├─";
-    //     verticalEnd = "│ ";
-    // }
+    RectDrawer() = default;
 
     void drawNode(
         const std::shared_ptr<JsonNode>& jsonNode, 
         const std::string& selfLink, 
         const std::string& childLink) override;
     void drawDecorate() override;
+    void drawIcon() override;
 };
 
 #endif // DRAWER_H

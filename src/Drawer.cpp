@@ -121,8 +121,8 @@ void RectDrawer::drawDecorate() {
         auto &lastLine = outputBuffer->getLines().back();
         lastLine.getElements().back() = "┘";
 
-        // 第二个元素是 icon，替换为 "✩"
-        lastLine.getElements()[1] = "✩";
+        // // 第二个元素是 icon，替换为 "✩"
+        // lastLine.getElements()[1] = "✩";
         
         // 全部替换为封闭字符
         auto &jsonNode = lastLine.getJsonNode();
@@ -133,4 +133,19 @@ void RectDrawer::drawDecorate() {
         }
         lastLine.getElements()[0] = indents;
     }
+}
+void RectDrawer::drawIcon() {
+    for (auto &line : outputBuffer->getLines()) {
+        auto &jsonNode = line.getJsonNode();
+
+        if (jsonNode->getIsLeaf()) {
+            line.getElements()[1] = leafIcon;
+        } else {
+            line.getElements()[1] = ContainerIcon;
+        }
+    }
+
+    auto &lastLine = outputBuffer->getLines().back();
+    if (lastLine.getElements()[1] == " ")
+        lastLine.getElements()[1] = "✩";
 }
