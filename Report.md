@@ -120,7 +120,7 @@ poker-face-icon-family: 中间节点icon：♢ 叶节点icon：♤
 
 - 工厂方法之后：
 
-  ![截屏2024-05-26 18.33.53](/Users/hyjack/Documents/软工作业/DesignPattern/assets/截屏2024-05-26 18.33.53.png)
+  ![](./assets/1-FactoryMethod.png)
 
 - 优点：
 
@@ -145,7 +145,7 @@ poker-face-icon-family: 中间节点icon：♢ 叶节点icon：♤
   - 抽象工厂明确每种**抽象产品**的构造方法接口，仅返回抽象产品类型
   - 基于抽象工厂接口创建不同的工厂类，每个工厂类对应一种**具体变体风格**，实现具体构造方法，返回真正的具体产品类型
 
-  ![截屏2024-05-26 19.10.32](/Users/hyjack/Documents/软工作业/DesignPattern/assets/截屏2024-05-26 19.10.32.png)
+  ![](./assets/2-AbstractFactory.png)
 
 - 优点：
   - 确保同一具体工厂生成的产品相互匹配，即同一种变体风格
@@ -172,7 +172,7 @@ poker-face-icon-family: 中间节点icon：♢ 叶节点icon：♤
   - 想实现新组合对象的构造，只需要定义一组调用/配置
     - 可以额外实现一个主管类 Director 负责配置管理
 
-  ![截屏2024-05-26 19.26.09](/Users/hyjack/Documents/软工作业/DesignPattern/assets/截屏2024-05-26 19.26.09.png)
+  ![](./assets/3-Builder.png)
 
 - 优点：
   - 无需一个很多重载的超级构造函数
@@ -195,7 +195,7 @@ poker-face-icon-family: 中间节点icon：♢ 叶节点icon：♤
 
   - 叶子节点 Leaf / 中间节点 Composite
 
-  ![截屏2024-05-26 19.34.06](/Users/hyjack/Documents/软工作业/DesignPattern/assets/截屏2024-05-26 19.34.06.png)
+  ![](./assets/4-Composite.png)
 
 ## 开发过程
 
@@ -518,7 +518,7 @@ update:
 
 ### 类图
 
-![image-20240612210005887](/Users/hyjack/Documents/软工作业/DesignPattern/assets/image-20240612210005887.png)
+![](./assets/UML.png)
 
 ### 设计模式
 
@@ -552,4 +552,4 @@ update:
 
 ### 输出  
 
-![截屏2024-06-12 20.56.45](/Users/hyjack/Documents/软工作业/DesignPattern/assets/截屏2024-06-12 20.56.45.png)
+![](./assets/outputs.png)
