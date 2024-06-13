@@ -65,10 +65,10 @@ void JsonTree::readJson(const std::string &filePath) {
 
     json j;
     file >> j;
-    parseJson(j);
+    parseJsonNode(j);
 }
 
-void JsonTree::parseJson(const json &j) {
+void JsonTree::parseJsonNode(const json &j) {
     root = std::make_shared<JsonContainer>("root", 0);
 
     // 格式定义

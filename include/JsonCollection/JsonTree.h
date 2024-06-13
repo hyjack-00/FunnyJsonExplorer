@@ -4,9 +4,10 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
-#include <iostream>
+#include "JsonCollection.h"
 
 using json = nlohmann::json;
 
@@ -59,19 +60,19 @@ private:
 };
 
 
-class JsonTree {
-public:
-    JsonTree() = default;
-    explicit JsonTree(const std::string &filePath);
-
-    void readJson(const std::string &filePath);
-    void parseJson(const json &j);
-    void clearJson();
-
-    std::shared_ptr<JsonNode> getRoot() const { return root; }
-
+class JsonTree : public JsonCollection {
 private:
     std::shared_ptr<JsonNode> root;
+    void parseJsonNode(const json &j);
+
+public:
+    JsonTree() = default;
+    JsonTree(const std::string &filePath);
+
+    void readJson(const std::string &filePath) override;
+    void clearJson() override;
+
+    std::shared_ptr<JsonNode> getRoot() const { return root; }
 };
 
 #endif // JSON_TREE_H
