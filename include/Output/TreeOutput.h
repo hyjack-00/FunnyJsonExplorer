@@ -1,9 +1,13 @@
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#ifndef JSON_TREE_OUTPUT_H
+#define JSON_TREE_OUTPUT_H
 
 #include <string>
 #include <vector>
-#include "JsonTree.h"
+
+#include "Output.h"
+
+// 直接是 JsonTree 的输出类
+#include "JsonCollection/JsonTree.h"
 
 class OutputLine {
 private:
@@ -18,7 +22,7 @@ public:
     const std::shared_ptr<JsonNode>& getJsonNode() const;
 };
 
-class OutputBuffer {
+class OutputBuffer : public AbstractOutputBuffer {
 private:
     std::vector<OutputLine> lines;
 
@@ -29,4 +33,4 @@ public:
     void print() const;
 };
 
-#endif // OUTPUT_H
+#endif // JSON_TREE_OUTPUT_H

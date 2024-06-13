@@ -1,14 +1,16 @@
 #ifndef DRAWER_H
 #define DRAWER_H
 
-#include "JsonTree.h"
-#include "Output.h"
+#include "JsonCollection/JsonTree.h"
+#include "Output/TreeOutput.h"
 
 enum DrawerType {
     DefaultStyle,
     TreeStyle,
     RectStyle
 };
+
+
 class Drawer {
 friend class DrawerFactory;
 

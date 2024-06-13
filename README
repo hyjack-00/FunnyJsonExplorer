@@ -1,3 +1,5 @@
 # FunnyJsonExplorer
 
-自依赖，使用 CMake 3.28.3 构建。设计相关内容见 `report.md`。
+自依赖，使用 CMake 3.28.3 构建。设计相关内容见 `Report.md`。
+
+为了更好交作业，进阶版见额外的 `Report-2.md`。

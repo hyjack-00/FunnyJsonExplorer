@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <cxxopts/cxxopts.hpp> 
 
-#include "JsonTree.h"
-#include "Output.h"
-#include "Drawer.h"
-#include "DrawerFactory.h"
+#include "JsonCollection/JsonTree.h"
+#include "Output/TreeOutput.h"
+#include "Visitor/Drawer/Drawer.h"
+#include "Visitor/Drawer/DrawerFactory.h"
 
 DrawerFactoryRegistry registry;
 

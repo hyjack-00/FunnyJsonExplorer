@@ -1,0 +1,5 @@
+#ifndef JSON_COLLECTION_H
+#define JSON_COLLECTION_H
+
+
+#endif // JSON_COLLECTION_H

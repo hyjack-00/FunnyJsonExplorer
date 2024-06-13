@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 包含头文件目录
 include_directories(include)
+include_directories(3rdparty)
 
 # 将 src 目录下的所有 .cpp 文件添加到变量 SRC_FILES 中
 aux_source_directory(src SRC_FILES)

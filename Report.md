@@ -461,7 +461,7 @@ update:
   - 先 factory 可能后面还要改，先搞个 obj 子类的例子似乎有助于写 factory
   
 - 抽象工厂的 client 代码要怎么用？
-  - registry + param mux 
+  - registry + param mux 可以接受，但也需要逐个手动 register
 
 
 ### closed
