@@ -11,12 +11,10 @@
 
 using json = nlohmann::json;
 
-class JsonNode {
+class JsonNode : public JsonElement {
 public:
     JsonNode(bool isLeaf, int level) : isLeaf(isLeaf), level(level) {}
     virtual ~JsonNode() = default;
-    virtual int countRows() const = 0;
-    virtual int countMaxLen() const = 0;
     virtual std::string drawContent() const = 0;
     virtual std::vector<std::shared_ptr<JsonNode>> getChildren() const = 0;
 
@@ -33,8 +31,6 @@ public:
     JsonLeaf(const std::string &name, int level, const std::string &value)
         : JsonNode(true, level), name(name), value(value) {}
 
-    int countRows() const override;
-    int countMaxLen() const override;
     std::string drawContent() const override;
     std::vector<std::shared_ptr<JsonNode>> getChildren() const override;
 
@@ -49,14 +45,24 @@ public:
         : JsonNode(false, level), name(name) {}
 
     void add(std::shared_ptr<JsonNode> node);
-    int countRows() const override;
-    int countMaxLen() const override;
     std::string drawContent() const override;
     std::vector<std::shared_ptr<JsonNode>> getChildren() const override;
 
 private:
     std::string name;
     std::vector<std::shared_ptr<JsonNode>> children;
+};
+
+
+class JsonTreeIterator : public JsonIterator {
+private:
+
+public:
+    JsonTreeIterator() = default;
+    ~JsonTreeIterator() = default;
+
+    bool hasMore() const override;
+    JsonNode* getNext() const override;
 };
 
 
@@ -72,6 +78,9 @@ public:
     void readJson(const std::string &filePath) override;
     void clearJson() override;
 
+    JsonTreeIterator* createIterator() override;
+
+    // todo: rm
     std::shared_ptr<JsonNode> getRoot() const { return root; }
 };
 

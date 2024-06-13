@@ -203,3 +203,7 @@ FJE 初版
   ```
 
   还是 2 更清楚一点
+
+- Override 修改返回值类型：协变返回值类型
+
+  https://zh.wikipedia.org/zh-cn/%E5%8D%8F%E5%8F%98%E8%BF%94%E5%9B%9E%E5%80%BC%E7%B1%BB%E5%9E%8B

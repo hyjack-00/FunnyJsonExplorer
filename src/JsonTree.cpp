@@ -1,60 +1,47 @@
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 
 #include "JsonCollection/JsonTree.h"
 
 // JsonLeaf method implementations
-int JsonLeaf::countRows() const {
-    return 1;
-}
-
-int JsonLeaf::countMaxLen() const {
-    return name.size() + (value.empty() ? 0 : (value.size() + 2));
-}
-
 std::string JsonLeaf::drawContent() const {
     return value.empty() ? name : name + ": " + value;
 }
-
 std::vector<std::shared_ptr<JsonNode>> JsonLeaf::getChildren() const {
     return {};
 }
+
 
 // JsonContainer method implementations
 void JsonContainer::add(std::shared_ptr<JsonNode> node) {
     children.push_back(node);
 }
-
-int JsonContainer::countRows() const {
-    int rows = 1; // include self
-    for (const auto &child : children) {
-        rows += child->countRows();
-    }
-    return rows;
-}
-
-int JsonContainer::countMaxLen() const {
-    int maxLen = name.size();
-    for (const auto &child : children) {
-        int childMaxLen = child->countMaxLen();
-        if (childMaxLen > maxLen) {
-            maxLen = childMaxLen;
-        }
-    }
-    return maxLen;
-}
-
 std::string JsonContainer::drawContent() const {
     return name;
 }
-
 std::vector<std::shared_ptr<JsonNode>> JsonContainer::getChildren() const {
     return children;
 }
 
+
+// JsonTreeIterator method implementations
+bool JsonTreeIterator::hasMore() const {
+    return true;
+}
+JsonNode* JsonTreeIterator::getNext() const {
+    return nullptr;
+}
+
+
+
 // JsonTree method implementations
 JsonTree::JsonTree(const std::string &filePath) {
     readJson(filePath);
+}
+
+JsonTreeIterator* JsonTree::createIterator() {
+    return nullptr;
 }
 
 void JsonTree::readJson(const std::string &filePath) {
