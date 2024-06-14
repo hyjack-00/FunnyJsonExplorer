@@ -10,19 +10,10 @@
 
 
 // DrawerFactory
-// void DrawerFactory::setLink(const std::string& branch, const std::string& vertical, const std::string& branchEnd, const std::string& verticalEnd) {
-//     drawer->branch = branch;
-//     drawer->vertical = vertical;
-//     drawer->branchEnd = branchEnd;
-//     drawer->verticalEnd = verticalEnd;
-// }
-void DrawerFactory::setIcon(const std::string& leafIcon, const std::string& containerIcon) {
+void DrawerFactory::setIcon(const std::string& leafIcon, const std::string& containerIcon, const int iconLen) {
     drawer->leafIcon = leafIcon;
     drawer->containerIcon = containerIcon;
-}
-void DrawerFactory::setCharLen(const int linkLen, const int iconLen) {
     drawer->iconLen = iconLen;
-    drawer->indentLen = linkLen + drawer->iconLen;
 }
 
 void DrawerFactory::resetDefaultDrawer() {
@@ -47,10 +38,10 @@ std::unique_ptr<Drawer> DrawerFactory::createDefaultDrawer() {
 std::unique_ptr<Drawer> DrawerFactory::createTreeDrawer() {
     resetTreeDrawer();
 
-    branch      = "├─";
-    vertical    = "│ ";
-    branchEnd   = "└─";
-    verticalEnd = "  ";
+    branch      = " ├─";
+    vertical    = " │ ";
+    branchEnd   = " └─";
+    verticalEnd = "   ";
 
     build();
 
@@ -59,10 +50,10 @@ std::unique_ptr<Drawer> DrawerFactory::createTreeDrawer() {
 std::unique_ptr<Drawer> DrawerFactory::createRectDrawer() {
     resetRectDrawer();
 
-    branch      = "├─";
-    vertical    = "│ ";
-    branchEnd   = "├─";
-    verticalEnd = "│ ";
+    branch      = " ├─";
+    vertical    = " │ ";
+    branchEnd   = " ├─";
+    verticalEnd = " │ ";
 
     build();
 
@@ -102,9 +93,7 @@ void ConfigDrawerFactory::loadConfigFile(const std::string& configFilePath) {
         std::istringstream iss(line);
         std::string key, value;
         if (std::getline(iss, key, '=') && std::getline(iss, value)) {
-            if (key == "linkIcon") {
-                linkIcon = value;
-            } else if (key == "leafIcon") {
+            if (key == "leafIcon") {
                 leafIcon = value;
             } else if (key == "containerIcon") {
                 containerIcon = value;

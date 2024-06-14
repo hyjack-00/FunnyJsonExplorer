@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include "JsonCollection/JsonTree.h"
 #include "Output/TreeOutput.h"
 #include "Visitor/Drawer/Drawer.h"
@@ -8,18 +9,21 @@
 // Drawer builder 默认实现
 std::shared_ptr<OutputBuffer> Drawer::getOutput(const JsonTree& tree) {
     DEBUG_PRINT("Draw with branch '%s', vertical '%s', branchEnd '%s', verticalEnd '%s'",
-                link.branch.c_str(), link.vertical.c_str(), 
-                link.branchEnd.c_str(), link.verticalEnd.c_str()); 
+                link.getLink(LinkType::Branch).c_str(),
+                link.getLink(LinkType::Vertical).c_str(),
+                link.getLink(LinkType::BranchEnd).c_str(),
+                link.getLink(LinkType::VerticalEnd).c_str());
     DEBUG_PRINT("Draw with leafIcon '%s', containerIcon '%s'", 
                 leafIcon.c_str(), containerIcon.c_str());
-    DEBUG_PRINT("Draw with linkLen %d, iconLen %d, indentLen %d", 
-                link.linkLen, iconLen, indentLen);
+    DEBUG_PRINT("Draw with linkLen %d, iconLen %d", 
+                link.getLinkLen(), iconLen);
 
     reset();
     auto iter = tree.createIterator();
     while (iter->hasMore()) {
         auto node = iter->getNext();
-        drawLine(node, tree.isLastChild(iter));
+        currentIsLastChild = ((JsonTreeIterator*) iter.get())->isLastChild();
+        drawLine(node);
     }
     drawDecorate();
     return outputBuffer; 
@@ -37,8 +41,8 @@ void Drawer::reset() {
 }
 
 // DFS
-void Drawer::drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild) {
-    DEBUG_PRINT("To draw node %s", jsonNode->getName().c_str());
+void Drawer::drawLine(const std::shared_ptr<JsonNode> jsonNode) {
+    DEBUG_PRINT("TO DRAW NODE %s", jsonNode->getName().c_str());
 
     int level = jsonNode->getLevel();
     if (level == currentLevel) {
@@ -46,7 +50,9 @@ void Drawer::drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild
     } 
     else if (level == currentLevel + 1) {
         DEBUG_PRINT("level += %d", 1);
-        link.stepIn(currentIndent, isLastChild);
+        // bool isLastChild = JsonTree::isLastChild(jsonNode);
+        // DEBUG_PRINT("isLastChild 1.fromFather = %d, 2.fromIter = %d", isLastChild, currentIsLastChild);
+        link.stepIn(currentIndent, currentIsLastChild);
         currentLevel = level;
     } 
     else if (level < currentLevel) {

@@ -5,6 +5,8 @@
 
 #include "JsonCollection/JsonTree.h"
 
+#include "utils.h"
+
 // JsonLeaf method implementations
 std::vector<std::shared_ptr<JsonNode>> JsonLeaf::getChildren() const {
     return {};
@@ -45,7 +47,7 @@ const std::shared_ptr<JsonNode> JsonTreeIterator::getNext() {  // DFS
 
     // 获取子节点并按逆序压入栈中
     const auto& children = currentNode->getChildren();
-    for (size_t i = 0; i < children.size(); ++i) {
+    for (int i = children.size() - 1; i >= 0; --i) {
         nodeStack.push(children[i]);
         parentStack.push({currentNode, i});
     }
@@ -59,13 +61,15 @@ bool JsonTreeIterator::isLastChild() const {
     }
 
     auto parent = currentInfo.first;
-    size_t index = currentInfo.second;
-
+    auto index = currentInfo.second;
     if (!parent) {
         return true; // Root node case
     }
+
     const auto& siblings = parent->getChildren();
-    return index == siblings.size() - 1;
+    DEBUG_PRINT("%lu / %lu", index, siblings.size());
+    bool result = index == siblings.size() - 1;
+    return result;
 }
 
 
@@ -89,49 +93,50 @@ void JsonTree::readJson(const std::string &filePath) {
     parseJsonNode(j);
 }
 
-void JsonTree::parseJsonNode(const json &j) {
-    root = std::make_shared<JsonContainer>("root", 0);
+void JsonTree::parseHelper(const json &j, std::shared_ptr<JsonContainer> parent) {
+    if (!j.is_object()) {
+        throw std::runtime_error("Unsupported JSON format: array / straight value");
+    }
 
-    // 格式定义
-    std::function<void(const json &, std::shared_ptr<JsonContainer>)> parseHelper = 
-    [&](const json &j, std::shared_ptr<JsonContainer> parent) {
-        if (j.is_object()) {
-            for (auto it = j.begin(); it != j.end(); ++it) {
-                if (it->is_object()) {
-                    auto container = std::make_shared<JsonContainer>(
-                        it.key(), parent->getLevel() + 1);
-                    parent->add(container);
-                    parseHelper(it.value(), container);
-                } 
-                else if (it->is_array()) {
-                    throw std::runtime_error("Unsupported JSON format: array");
-                }
-                else {
-                    auto value = it->dump();
-                    if (value == "null") value = "";
-                    else                 value = value.substr(1, value.size() - 2);
-                    auto leaf = std::make_shared<JsonLeaf>(
-                        it.key(), parent->getLevel() + 1, value);
-                    parent->add(leaf);
-                }
-            }
+    for (auto it = j.begin(); it != j.end(); ++it) {
+        if (it->is_object()) {
+            auto container = std::make_shared<JsonContainer>(
+                it.key(), parent->getLevel() + 1, parent);
+            parent->add(container);
+            parseHelper(it.value(), container);
         } 
-        else {
-            throw std::runtime_error("Unsupported JSON format: array / straight value");
+        else if (it->is_array()) {
+            throw std::runtime_error("Unsupported JSON format: array");
         }
-    };
+        else {
+            auto value = it->dump();
+            if (value == "null") value = "";
+            else                 value = value.substr(1, value.size() - 2);
+            auto leaf = std::make_shared<JsonLeaf>(
+                it.key(), parent->getLevel() + 1, value, parent);
+            parent->add(leaf);
+        }
+    }
+}
 
-    parseHelper(j, std::dynamic_pointer_cast<JsonContainer>(root));
+void JsonTree::parseJsonNode(const json &j) {
+    auto _root = std::make_shared<JsonContainer>("root", 0, nullptr);
+    parseHelper(j, _root);
+    root = _root;
 }
 
 void JsonTree::clearJson() {
     root.reset();
 }
 
-bool JsonTree::isLastChild(std::unique_ptr<JsonIterator<JsonNode>>& iter) {
-    auto treeIter = dynamic_cast<JsonTreeIterator*>(iter.get());
-    if (!treeIter) {
-        throw std::runtime_error("Invalid iterator type.");
+bool JsonTree::isLastChild(std::shared_ptr<JsonNode> jsonNode) {
+    auto father = jsonNode->getFather();
+    if (!father) {
+        return true; // Root node case
     }
-    return treeIter->isLastChild();
+
+    const auto& siblings = father->getChildren();
+    bool isLastChild = siblings.back() == jsonNode;
+    DEBUG_PRINT("%d", isLastChild);
+    return isLastChild;
 }

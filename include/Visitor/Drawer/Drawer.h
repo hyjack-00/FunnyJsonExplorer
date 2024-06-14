@@ -42,28 +42,18 @@ protected:
     std::shared_ptr<OutputLine> currentLine;
     std::string currentIndent;
     int currentLevel;
+    bool currentIsLastChild;
 
     Printer printer;
 
     Link link;
 
-    // // link strings
-    // std::string branch;
-    // std::string vertical;
-    // std::string branchEnd;
-    // std::string verticalEnd;
-    // std::string linkIcon;
-    // int linkLen;
-
-    // icon string
     std::string leafIcon;
     std::string containerIcon;
     int iconLen;
     void drawLeafIcon();
     void drawContainerIcon();
 
-    // indention = link + icon
-    int indentLen;
 
 public:
     Drawer() = default;
@@ -73,7 +63,7 @@ public:
     virtual std::shared_ptr<OutputBuffer> getOutput(const JsonTree& tree);
     virtual std::shared_ptr<OutputBuffer> getOutput();
 
-    virtual void drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild);
+    virtual void drawLine(const std::shared_ptr<JsonNode> jsonNode);
     virtual void drawIcon(const std::shared_ptr<JsonNode> jsonNode);
     virtual void drawDecorate();
 

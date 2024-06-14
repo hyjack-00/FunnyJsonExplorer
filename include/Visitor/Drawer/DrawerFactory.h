@@ -20,33 +20,24 @@ class DrawerFactory {
 protected:
     std::unique_ptr<Drawer> drawer;
 
-    std::string branch      = "  ";
-    std::string vertical    = "  ";
-    std::string branchEnd   = "  ";
-    std::string verticalEnd = "  ";
-    std::string linkIcon      = " ";
-    int linkLen = 2;
+    std::string branch      = "   ";
+    std::string vertical    = "   ";
+    std::string branchEnd   = "   ";
+    std::string verticalEnd = "   ";
+    int linkLen = 3;
 
     std::string leafIcon      = " ";
     std::string containerIcon = " ";
     int iconLen = 1;
 
-    // friend class Drawer;
-    // void setLink(
-    //     const std::string &branch, const std::string &vertical, 
-    //     const std::string &branchEnd, const std::string &verticalEnd);
     void setIcon(
         const std::string &leafIcon, 
-        const std::string &containerIcon);
-    void setCharLen(
-        const int linkLen, 
+        const std::string &containerIcon,
         const int iconLen);
 
     void build() {
-        drawer->link.setLink(
-            branch, vertical, branchEnd, verticalEnd, linkIcon, linkLen, iconLen);
-        setIcon(leafIcon, containerIcon);
-        setCharLen(linkLen, iconLen);
+        drawer->link = Link(branch, vertical, branchEnd, verticalEnd, linkLen);
+        setIcon(leafIcon, containerIcon, iconLen);
     }
 
 public:
@@ -71,7 +62,6 @@ private:
 
 public:
     PokerDrawerFactory() {
-        linkIcon = " ";
         leafIcon = "♤";
         containerIcon = "♢";
     }

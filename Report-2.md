@@ -267,3 +267,27 @@ FJE 初版
 - Shared_ptr 有一定开销，函数传参可以考虑外面再套一层引用，但前提是能保证传参时不会传一个 make_shared<..>() 的新东西，而是在访问已有的 shared_ptr
 
   - 所以外部访问可以用 `shared_ptr<A> &a`，但紧耦合的类函数不能用 `&`
+
+- 让 enum 有自己的方法：
+
+  ```cpp
+  struct LinkType {
+      enum T {
+          Branch,
+          Vertical,
+          BranchEnd,
+          VerticalEnd,
+          other
+      };
+  
+      static bool isVerticalLink(LinkType::T linkType) {
+          return (int)linkType & 1;
+      }
+      static bool isEndLink(LinkType::T linkType) {
+          return (int)linkType & 2;
+      }
+  
+  };
+  ```
+
+  
