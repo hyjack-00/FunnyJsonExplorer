@@ -79,7 +79,6 @@ private:
 public:
     TreeDrawer() = default;
 
-    // void drawDecorate() override;
 };
 
 
@@ -89,8 +88,8 @@ private:
 public:
     RectDrawer() = default;
 
-    // void drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild) override;
-    // void drawDecorate() override;
+    void drawLine(const std::shared_ptr<JsonNode> jsonNode) override;
+    void drawDecorate() override;
 };
 
 #endif // DRAWER_H
