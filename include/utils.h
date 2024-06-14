@@ -1,6 +1,6 @@
 #include <cstdio>
 
-// #define RELEASE
+#define RELEASE
 
 
 // Helper macro to extract file name from full path

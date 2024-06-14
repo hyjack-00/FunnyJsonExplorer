@@ -67,8 +67,8 @@ bool JsonTreeIterator::isLastChild() const {
     }
 
     const auto& siblings = parent->getChildren();
-    DEBUG_PRINT("%lu / %lu", index, siblings.size());
     bool result = index == siblings.size() - 1;
+    DEBUG_PRINT("%lu / %lu, %d", index, siblings.size(), result);
     return result;
 }
 

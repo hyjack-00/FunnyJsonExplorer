@@ -160,6 +160,8 @@ FJE 初版
 
 ### 实现
 
+- 文件目录大重构
+
 - 每个小东西视为一个 link，多个构成左侧的一个 indent
 
   ```cpp
@@ -173,8 +175,7 @@ FJE 初版
 - 改变绘制遍历方式，每次就一行
   - 如果 level 增加，替换 indent 最右侧的 branch* -> vertical* 
   - 如果 level 减小，减少一级，替换 indent 最右侧的 vertical* -> branch*
-- visit() 实现
-- Visit accept?
+- 
 
 
 
@@ -291,3 +292,17 @@ FJE 初版
   ```
 
   
+
+isLastChild
+
+```
+-
+ +0
+  +0
+  =1
+ 1
+  1
+   0
+   1
+```
+

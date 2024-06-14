@@ -22,6 +22,7 @@ std::shared_ptr<OutputBuffer> Drawer::getOutput(const JsonTree& tree) {
     auto iter = tree.createIterator();
     while (iter->hasMore()) {
         auto node = iter->getNext();
+        DEBUG_PRINT("TO DRAW NODE %s", node->getName().c_str());
         currentIsLastChild = ((JsonTreeIterator*) iter.get())->isLastChild();
         drawLine(node);
     }
@@ -42,16 +43,13 @@ void Drawer::reset() {
 
 // DFS
 void Drawer::drawLine(const std::shared_ptr<JsonNode> jsonNode) {
-    DEBUG_PRINT("TO DRAW NODE %s", jsonNode->getName().c_str());
-
     int level = jsonNode->getLevel();
     if (level == currentLevel) {
         DEBUG_PRINT("level == %s", "");
+        link.stepStay(currentIndent, currentIsLastChild);
     } 
     else if (level == currentLevel + 1) {
         DEBUG_PRINT("level += %d", 1);
-        // bool isLastChild = JsonTree::isLastChild(jsonNode);
-        // DEBUG_PRINT("isLastChild 1.fromFather = %d, 2.fromIter = %d", isLastChild, currentIsLastChild);
         link.stepIn(currentIndent, currentIsLastChild);
         currentLevel = level;
     } 
@@ -59,7 +57,7 @@ void Drawer::drawLine(const std::shared_ptr<JsonNode> jsonNode) {
         int skipLevel = currentLevel - level;
         DEBUG_PRINT("level -= %d", skipLevel);
         while (skipLevel-- > 0)
-            link.stepOut(currentIndent);
+            link.stepOut(currentIndent, currentIsLastChild);
         currentLevel = level;
     }
     else {
