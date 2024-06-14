@@ -157,6 +157,15 @@ FJE 初版
 
 
 
+TODO
+
+- 改变绘制遍历方式，每次就一行
+  - 暂时使用 if 判断 leaf / cont
+- visit() 实现
+- Visit accept?
+
+
+
 ## 问题
 
 ### open
@@ -207,3 +216,5 @@ FJE 初版
 - Override 修改返回值类型：协变返回值类型
 
   https://zh.wikipedia.org/zh-cn/%E5%8D%8F%E5%8F%98%E8%BF%94%E5%9B%9E%E5%80%BC%E7%B1%BB%E5%9E%8B
+
+  - 可惜不能与智能指针共用

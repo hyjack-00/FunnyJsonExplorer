@@ -26,11 +26,27 @@ std::vector<std::shared_ptr<JsonNode>> JsonContainer::getChildren() const {
 
 
 // JsonTreeIterator method implementations
-bool JsonTreeIterator::hasMore() const {
-    return true;
+JsonTreeIterator::JsonTreeIterator(std::shared_ptr<JsonNode>& root) {
+    stack.push(root);
 }
-JsonNode* JsonTreeIterator::getNext() const {
-    return nullptr;
+bool JsonTreeIterator::hasMore() const {
+    return !stack.empty();
+}
+const JsonNode* JsonTreeIterator::getNext() {  // DFS
+    if (stack.empty()) {
+        return nullptr;
+    }
+
+    auto current = stack.top();
+    stack.pop();
+
+    // 获取子节点并按逆序压入栈中
+    const auto& children = current->getChildren();
+    for (auto it = children.rbegin(); it != children.rend(); ++it) {
+        stack.push(*it);
+    }
+
+    return current.get();
 }
 
 

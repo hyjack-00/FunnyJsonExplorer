@@ -6,10 +6,7 @@
 
 // 抽象元素
 class JsonElement {
-private:
 
-public:
-    virtual ~JsonElement() = default;
 };
 
 // 抽象迭代器
@@ -21,7 +18,7 @@ public:
     virtual ~JsonIterator() = default;
 
     virtual bool hasMore() const = 0;
-    virtual JsonElement* getNext() const = 0;
+    virtual const JsonElement* getNext() = 0;
 };
 
 // 抽象集合

@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "Visitor/Drawer/Drawer.h"
 #include "Visitor/Drawer/DrawerFactory.h"
 
 
@@ -68,12 +69,8 @@ std::unique_ptr<Drawer> DrawerFactory::createDrawer(DrawerType drawerType) {
     }
 }
 std::unique_ptr<Drawer> DrawerFactory::createDrawer(const std::string& drawerTypeName) {
-    static std::map<std::string, DrawerType> drawerTypeMap = {
-        {"default", DrawerType::DefaultStyle},
-        {"tree", DrawerType::TreeStyle},
-        {"rect", DrawerType::RectStyle}
-    };
-    return std::move(createDrawer(drawerTypeMap[drawerTypeName]));
+    return std::move(createDrawer(
+        DrawerRegistry::getDrawerType(drawerTypeName)));
 }
 
 

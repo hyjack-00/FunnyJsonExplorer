@@ -3,6 +3,7 @@
 
 #include "JsonCollection/JsonTree.h"
 #include "Output/TreeOutput.h"
+#include "Visitor/Visitor.h"
 
 enum DrawerType {
     DefaultStyle,
@@ -10,6 +11,17 @@ enum DrawerType {
     RectStyle
 };
 
+class DrawerRegistry {
+public:
+    static DrawerType getDrawerType(const std::string& typeStr) {
+        static std::map<std::string, DrawerType> drawerTypeMap = {
+            {"default", DrawerType::DefaultStyle},
+            {"tree", DrawerType::TreeStyle},
+            {"rect", DrawerType::RectStyle}
+        };
+        return drawerTypeMap[typeStr];
+    }
+};
 
 class Drawer {
 friend class DrawerFactory;
@@ -37,8 +49,8 @@ public:
     Drawer() = default;
     virtual ~Drawer() = default;
 
-    void reset();
-    virtual std::shared_ptr<OutputBuffer> getOutput(const std::shared_ptr<JsonNode>& rootNode);
+    virtual void reset();
+    virtual std::shared_ptr<OutputBuffer> getOutput(const JsonTree& tree);
     virtual std::shared_ptr<OutputBuffer> getOutput();
     virtual void drawNode(
         const std::shared_ptr<JsonNode>& jsonNode, 
