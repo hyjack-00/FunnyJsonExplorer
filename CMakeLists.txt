@@ -17,6 +17,9 @@ aux_source_directory(src SRC_FILES)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
+# 添加编译参数：-g
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
 # 添加可执行文件，包含 SRC_FILES 中的所有源文件
 add_executable(fje ${SRC_FILES})
 

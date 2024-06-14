@@ -15,7 +15,7 @@ private:
     std::shared_ptr<JsonNode> jsonNode;
 
 public:
-    OutputLine(const std::shared_ptr<JsonNode>& jsonNode) 
+    OutputLine(const std::shared_ptr<JsonNode> jsonNode) 
         : jsonNode(jsonNode) {}
     void addElement(const std::string& element);
     std::vector<std::string>& getElements();
@@ -24,11 +24,11 @@ public:
 
 class OutputBuffer : public AbstractOutputBuffer {
 private:
-    std::vector<OutputLine> lines;
+    std::vector<std::shared_ptr<OutputLine>> lines;
 
 public:
-    void addLine(const OutputLine& line);
-    std::vector<OutputLine>& getLines();
+    void addLine(const std::shared_ptr<OutputLine> line);
+    std::vector<std::shared_ptr<OutputLine>>& getLines();
     void clear();
     void print() const;
 };

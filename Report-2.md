@@ -70,7 +70,8 @@ FJE 初版
 
 1. 增加 JsonNode 的迭代器
 2. 将 Drawer 视为 Visitor
-3. 其他小问题
+3. 把 JsonNode 的 drawContent 拿出来另一个 Visitor
+4. 其他小问题
    - Drawer::draw() 直接传入 jsonTree 而不是 root
 
 ---
@@ -157,10 +158,21 @@ FJE 初版
 
 
 
-TODO
+### 实现
+
+- 每个小东西视为一个 link，多个构成左侧的一个 indent
+
+  ```cpp
+                   tree  / rect
+  branch           '├─ '   '├─ '
+  Vertical         '│  '   '│  '
+  branchEnd        '└─ '   '├─ '
+  VerticalEnd      '   '   '│  '
+  ```
 
 - 改变绘制遍历方式，每次就一行
-  - 暂时使用 if 判断 leaf / cont
+  - 如果 level 增加，替换 indent 最右侧的 branch* -> vertical* 
+  - 如果 level 减小，减少一级，替换 indent 最右侧的 vertical* -> branch*
 - visit() 实现
 - Visit accept?
 
@@ -170,7 +182,46 @@ TODO
 
 ### open
 
-- 
+- Override 修改返回值类型：协变返回值类型
+
+  https://zh.wikipedia.org/zh-cn/%E5%8D%8F%E5%8F%98%E8%BF%94%E5%9B%9E%E5%80%BC%E7%B1%BB%E5%9E%8B
+
+  - 问题是不能与智能指针（泛型）共用：
+
+    ```cpp
+    struct Elem;
+    struct Iter {
+      Elem* getElem();                 // OK
+      std::shared_ptr<Elem> getElem(); // X
+    };
+    
+    struct JsonNode : public Elem;
+    struct TreeIter : public Iter {
+      JsonNode* getElem();                 // OK
+      std::shared_ptr<JsonNode> getElem(); // X
+    };
+    ```
+
+    我已经在各种地方都用了 shared_ptr 来表示 jsonNode 了，所以这并不能融入我的代码里
+
+  - 我使用模版来解决，不再把迭代器绑定到一个元素类型上
+
+    ```cpp
+    template<typename ElemType>
+    struct Iter {
+      std::shared_ptr<ElemType> getElem(); // OK
+    };
+    ```
+
+    而具体迭代器仍然可以绑定一个具体元素类型，在继承时指定模版类型即可
+
+    ```cpp
+    struct TreeIter : public Iter<JsonNode> {
+      std::shared_ptr<JsonNode> getElem(); // OK
+    };
+    ```
+
+    
 
 ### closed
 
@@ -213,8 +264,6 @@ TODO
 
   还是 2 更清楚一点
 
-- Override 修改返回值类型：协变返回值类型
+- Shared_ptr 有一定开销，函数传参可以考虑外面再套一层引用，但前提是能保证传参时不会传一个 make_shared<..>() 的新东西，而是在访问已有的 shared_ptr
 
-  https://zh.wikipedia.org/zh-cn/%E5%8D%8F%E5%8F%98%E8%BF%94%E5%9B%9E%E5%80%BC%E7%B1%BB%E5%9E%8B
-
-  - 可惜不能与智能指针共用
+  - 所以外部访问可以用 `shared_ptr<A> &a`，但紧耦合的类函数不能用 `&`

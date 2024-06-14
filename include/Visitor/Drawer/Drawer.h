@@ -1,9 +1,15 @@
 #ifndef DRAWER_H
 #define DRAWER_H
 
+#include <memory>
+
 #include "JsonCollection/JsonTree.h"
 #include "Output/TreeOutput.h"
 #include "Visitor/Visitor.h"
+#include "Visitor/Printer/Printer.h"
+#include "Symbol.h"
+
+#include "utils.h"
 
 enum DrawerType {
     DefaultStyle,
@@ -19,28 +25,42 @@ public:
             {"tree", DrawerType::TreeStyle},
             {"rect", DrawerType::RectStyle}
         };
+        
+        DEBUG_PRINT("type = %s, %d", typeStr.c_str(), drawerTypeMap[typeStr]);
+
         return drawerTypeMap[typeStr];
     }
 };
 
-class Drawer {
+class Drawer : public TreeVisitor {
 friend class DrawerFactory;
 
 protected:
+    // modified by drawXX();
     std::shared_ptr<OutputBuffer> outputBuffer;
 
-    // link strings
-    std::string branch;
-    std::string vertical;
-    std::string branchEnd;
-    std::string verticalEnd;
-    int linkLen;
+    std::shared_ptr<OutputLine> currentLine;
+    std::string currentIndent;
+    int currentLevel;
 
-    // icons between links
-    std::string defaultIcon;
+    Printer printer;
+
+    Link link;
+
+    // // link strings
+    // std::string branch;
+    // std::string vertical;
+    // std::string branchEnd;
+    // std::string verticalEnd;
+    // std::string linkIcon;
+    // int linkLen;
+
+    // icon string
     std::string leafIcon;
-    std::string ContainerIcon;
+    std::string containerIcon;
     int iconLen;
+    void drawLeafIcon();
+    void drawContainerIcon();
 
     // indention = link + icon
     int indentLen;
@@ -52,13 +72,16 @@ public:
     virtual void reset();
     virtual std::shared_ptr<OutputBuffer> getOutput(const JsonTree& tree);
     virtual std::shared_ptr<OutputBuffer> getOutput();
-    virtual void drawNode(
-        const std::shared_ptr<JsonNode>& jsonNode, 
-        const std::string& selfLink, 
-        const std::string& childLink);
+
+    virtual void drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild);
+    virtual void drawIcon(const std::shared_ptr<JsonNode> jsonNode);
     virtual void drawDecorate();
-    virtual void drawIcon();
+
+
+    void visit(const JsonLeaf *leaf) override;
+    void visit(const JsonContainer *container) override;
 };
+
 
 class TreeDrawer : public Drawer {
 private:
@@ -66,8 +89,9 @@ private:
 public:
     TreeDrawer() = default;
 
-    void drawDecorate() override;
+    // void drawDecorate() override;
 };
+
 
 class RectDrawer : public Drawer {
 private:
@@ -75,12 +99,8 @@ private:
 public:
     RectDrawer() = default;
 
-    void drawNode(
-        const std::shared_ptr<JsonNode>& jsonNode, 
-        const std::string& selfLink, 
-        const std::string& childLink) override;
-    void drawDecorate() override;
-    void drawIcon() override;
+    // void drawLine(const std::shared_ptr<JsonNode> jsonNode, bool isLastChild) override;
+    // void drawDecorate() override;
 };
 
 #endif // DRAWER_H

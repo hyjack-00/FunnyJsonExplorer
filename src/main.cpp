@@ -8,17 +8,19 @@
 #include "Output/TreeOutput.h"
 #include "Visitor/Drawer/Drawer.h"
 #include "Visitor/Drawer/DrawerFactory.h"
+#include "Visitor/Printer/Printer.h"
 
 DrawerFactoryRegistry registry;
 
 // Function to print the JSON tree structure
 void printJsonTree(const std::shared_ptr<JsonNode>& node, int indent = 0) {
+    Printer p;
     if (!node) return;
 
     for (int i = 0; i < indent; ++i) {
-        std::cout << "  ";
+        std::cout << "   ";
     }
-    std::cout << node->drawContent() << std::endl;
+    std::cout << p.getContent(node) << std::endl;
 
     for (const auto& child : node->getChildren()) {
         printJsonTree(child, indent + 1);
@@ -30,7 +32,7 @@ int main(int argc, char* argv[]) {
     cxxopts::Options options("FJE", "A command-line JSON file visualization tool");
     options.add_options()
         ("f,file", "JSON file path", cxxopts::value<std::string>())
-        ("s,style", "Style of visualization (tree/rect)", cxxopts::value<std::string>()->default_value("tree"))
+        ("s,style", "Style of visualization (tree/rect)", cxxopts::value<std::string>()->default_value("default"))
         ("i,icon", "Icon family to use", cxxopts::value<std::string>()->default_value("default"))
         ("c,config", "Configuration file path (required if -i config is used)", cxxopts::value<std::string>())
         ("h,help", "Print usage");
@@ -57,6 +59,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    auto iter = jsonTree.createIterator();
+    printJsonTree(iter.get()->getNext());
+
     // build drawer
     auto factory = registry.getFactory(iconFamily);
     if (iconFamily == "config") {
@@ -73,8 +78,7 @@ int main(int argc, char* argv[]) {
     auto drawer = factory->createDrawer(style);
 
     // build output
-    auto root = jsonTree.getRoot();
-    auto output = drawer->getOutput(root);
+    auto output = drawer->getOutput(jsonTree);
     output->print();
 
     return 0;

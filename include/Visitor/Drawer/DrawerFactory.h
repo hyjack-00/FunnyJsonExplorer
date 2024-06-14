@@ -5,6 +5,9 @@
 #include <map>
 
 #include "Drawer.h"
+#include "Symbol.h"
+
+#include "utils.h"
 
 enum FactoryType {
     DefaultIcon,
@@ -17,38 +20,42 @@ class DrawerFactory {
 protected:
     std::unique_ptr<Drawer> drawer;
 
-    // default 
     std::string branch      = "  ";
     std::string vertical    = "  ";
     std::string branchEnd   = "  ";
     std::string verticalEnd = "  ";
-    std::string defaultIcon   = " ";
+    std::string linkIcon      = " ";
+    int linkLen = 2;
+
     std::string leafIcon      = " ";
     std::string containerIcon = " ";
-    int linkLen = 2;
     int iconLen = 1;
 
     // friend class Drawer;
-    void setLink(
-        const std::string &branch, const std::string &vertical, 
-        const std::string &branchEnd, const std::string &verticalEnd);
+    // void setLink(
+    //     const std::string &branch, const std::string &vertical, 
+    //     const std::string &branchEnd, const std::string &verticalEnd);
     void setIcon(
-        const std::string &defaultIcon, 
         const std::string &leafIcon, 
-        const std::string &ContainerIcon);
+        const std::string &containerIcon);
     void setCharLen(
         const int linkLen, 
         const int iconLen);
-    void setAll() {
-        setLink(branch, vertical, branchEnd, verticalEnd);
-        setIcon(defaultIcon, leafIcon, containerIcon);
+
+    void build() {
+        drawer->link.setLink(
+            branch, vertical, branchEnd, verticalEnd, linkIcon, linkLen, iconLen);
+        setIcon(leafIcon, containerIcon);
         setCharLen(linkLen, iconLen);
     }
 
 public:
+    DrawerFactory() = default;
     virtual ~DrawerFactory() = default;
+    virtual void resetDefaultDrawer();
     virtual void resetTreeDrawer();
     virtual void resetRectDrawer();
+    virtual std::unique_ptr<Drawer> createDefaultDrawer();
     virtual std::unique_ptr<Drawer> createTreeDrawer();
     virtual std::unique_ptr<Drawer> createRectDrawer();
     std::unique_ptr<Drawer> createDrawer(DrawerType drawerType);
@@ -64,7 +71,7 @@ private:
 
 public:
     PokerDrawerFactory() {
-        defaultIcon = " ";
+        linkIcon = " ";
         leafIcon = "♤";
         containerIcon = "♢";
     }

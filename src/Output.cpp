@@ -14,18 +14,18 @@ const std::shared_ptr<JsonNode>& OutputLine::getJsonNode() const {
 
 
 // OutputBuffer 方法实现
-void OutputBuffer::addLine(const OutputLine& line) {
+void OutputBuffer::addLine(const std::shared_ptr<OutputLine> line) {
     lines.push_back(line);
 }
 void OutputBuffer::clear() {
     lines.clear();
 }
-std::vector<OutputLine>& OutputBuffer::getLines() {
+std::vector<std::shared_ptr<OutputLine>>& OutputBuffer::getLines() {
     return lines;
 }
 void OutputBuffer::print() const {
     for (auto line : lines) {
-        for (auto elem : line.getElements()) {
+        for (auto elem : line->getElements()) {
             std::cout << elem;
         }
         std::cout << std::endl;

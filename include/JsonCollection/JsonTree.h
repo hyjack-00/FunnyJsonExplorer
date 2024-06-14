@@ -9,24 +9,27 @@
 #include <nlohmann/json.hpp>
 
 #include "JsonCollection.h"
-class TreeVisitor;
+#include "Visitor/Visitor.h"
 
 using json = nlohmann::json;
 
 
-class JsonNode : public JsonElement {
+class JsonNode {
 public:
-    JsonNode(bool isLeaf, int level) : isLeaf(isLeaf), level(level) {}
+    JsonNode(bool isLeaf, int level, std::string name="") 
+        : isLeaf(isLeaf), level(level), name(name) {}
     virtual ~JsonNode() = default;
 
-    // virtual void accept(TreeVisitor &visitor) = 0;
-    virtual std::string drawContent() const = 0;
+    virtual void accept(TreeVisitor &visitor) = 0;
+
     virtual std::vector<std::shared_ptr<JsonNode>> getChildren() const = 0;
 
     int getLevel() const { return level; }
     bool getIsLeaf() const { return isLeaf; }
+    const std::string& getName() const { return name; }
 
 private:
+    std::string name;
     const bool isLeaf;
     const int level;
 };
@@ -35,14 +38,14 @@ private:
 class JsonLeaf : public JsonNode {
 public:
     JsonLeaf(const std::string &name, int level, const std::string &value)
-        : JsonNode(true, level), name(name), value(value) {}
+        : JsonNode(true, level, name), value(value) {}
 
-    // void accept(TreeVisitor &visitor) override;
-    std::string drawContent() const override;
+    void accept(TreeVisitor &v) override { v.visit(this); }
+
+    const std::string& getValue() const { return value; }
     std::vector<std::shared_ptr<JsonNode>> getChildren() const override;
 
 private:
-    std::string name;
     std::string value;
 };
 
@@ -50,32 +53,39 @@ private:
 class JsonContainer : public JsonNode {
 public:
     JsonContainer(const std::string &name, int level) 
-        : JsonNode(false, level), name(name) {}
+        : JsonNode(false, level, name) {}
     void add(std::shared_ptr<JsonNode> node);
 
-    // void accept(TreeVisitor &visitor) override;
-    std::string drawContent() const override;
+    void accept(TreeVisitor &v) override { v.visit(this); }
+
     std::vector<std::shared_ptr<JsonNode>> getChildren() const override;
 
 private:
-    std::string name;
     std::vector<std::shared_ptr<JsonNode>> children;
 };
 
 
-class JsonTreeIterator : public JsonIterator {
+class JsonTreeIterator : public JsonIterator<JsonNode> {
 private:
-    std::stack<std::shared_ptr<JsonNode>> stack; // DFS
+    // DFS
+    std::stack<std::shared_ptr<JsonNode>> nodeStack; 
+    // Track parent and child index
+    std::stack<std::pair<std::shared_ptr<JsonNode>, size_t>> parentStack; 
+
+    std::shared_ptr<JsonNode> currentNode;
+    std::pair<std::shared_ptr<JsonNode>, size_t> currentInfo;
 
 public:
-    JsonTreeIterator(std::shared_ptr<JsonNode>& root);
+    JsonTreeIterator(std::shared_ptr<JsonNode> root);
 
     bool hasMore() const override;
-    const JsonNode* getNext() override;
+    const std::shared_ptr<JsonNode> getNext() override;
+
+    bool isLastChild() const;
 };
 
 
-class JsonTree : public JsonCollection {
+class JsonTree : public JsonCollection<JsonNode> {
 private:
     std::shared_ptr<JsonNode> root;
     void parseJsonNode(const json &j);
@@ -87,10 +97,9 @@ public:
     void readJson(const std::string &filePath) override;
     void clearJson() override;
 
-    JsonTreeIterator* createIterator() override;
+    std::unique_ptr<JsonIterator<JsonNode>> createIterator() const override;
 
-    // todo: rm
-    std::shared_ptr<JsonNode> getRoot() const { return root; }
+    static bool isLastChild(std::unique_ptr<JsonIterator<JsonNode>>& iter);
 };
 
 #endif // JSON_TREE_H

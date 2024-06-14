@@ -1,13 +1,11 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "JsonCollection/JsonTree.h"
 
 // JsonLeaf method implementations
-std::string JsonLeaf::drawContent() const {
-    return value.empty() ? name : name + ": " + value;
-}
 std::vector<std::shared_ptr<JsonNode>> JsonLeaf::getChildren() const {
     return {};
 }
@@ -17,38 +15,58 @@ std::vector<std::shared_ptr<JsonNode>> JsonLeaf::getChildren() const {
 void JsonContainer::add(std::shared_ptr<JsonNode> node) {
     children.push_back(node);
 }
-std::string JsonContainer::drawContent() const {
-    return name;
-}
 std::vector<std::shared_ptr<JsonNode>> JsonContainer::getChildren() const {
     return children;
 }
 
 
 // JsonTreeIterator method implementations
-JsonTreeIterator::JsonTreeIterator(std::shared_ptr<JsonNode>& root) {
-    stack.push(root);
+JsonTreeIterator::JsonTreeIterator(std::shared_ptr<JsonNode> root) {
+    nodeStack.push(root);
+    parentStack.push({nullptr, 0}); // Root has no parent
+
+    currentNode = 0;
+    currentInfo = {nullptr, -1};
 }
 bool JsonTreeIterator::hasMore() const {
-    return !stack.empty();
+    return !nodeStack.empty();
 }
-const JsonNode* JsonTreeIterator::getNext() {  // DFS
-    if (stack.empty()) {
+
+const std::shared_ptr<JsonNode> JsonTreeIterator::getNext() {  // DFS
+    if (nodeStack.empty()) {
         return nullptr;
     }
 
-    auto current = stack.top();
-    stack.pop();
+    currentNode = nodeStack.top();
+    nodeStack.pop();
+
+    currentInfo = parentStack.top();
+    parentStack.pop();
 
     // 获取子节点并按逆序压入栈中
-    const auto& children = current->getChildren();
-    for (auto it = children.rbegin(); it != children.rend(); ++it) {
-        stack.push(*it);
+    const auto& children = currentNode->getChildren();
+    for (size_t i = 0; i < children.size(); ++i) {
+        nodeStack.push(children[i]);
+        parentStack.push({currentNode, i});
     }
 
-    return current.get();
+    return currentNode;
 }
 
+bool JsonTreeIterator::isLastChild() const {
+    if (currentInfo.second == -1) {
+        return true; // init case
+    }
+
+    auto parent = currentInfo.first;
+    size_t index = currentInfo.second;
+
+    if (!parent) {
+        return true; // Root node case
+    }
+    const auto& siblings = parent->getChildren();
+    return index == siblings.size() - 1;
+}
 
 
 // JsonTree method implementations
@@ -56,8 +74,8 @@ JsonTree::JsonTree(const std::string &filePath) {
     readJson(filePath);
 }
 
-JsonTreeIterator* JsonTree::createIterator() {
-    return nullptr;
+std::unique_ptr<JsonIterator<JsonNode>> JsonTree::createIterator() const {
+    return std::make_unique<JsonTreeIterator>(root);
 }
 
 void JsonTree::readJson(const std::string &filePath) {
@@ -108,4 +126,12 @@ void JsonTree::parseJsonNode(const json &j) {
 
 void JsonTree::clearJson() {
     root.reset();
+}
+
+bool JsonTree::isLastChild(std::unique_ptr<JsonIterator<JsonNode>>& iter) {
+    auto treeIter = dynamic_cast<JsonTreeIterator*>(iter.get());
+    if (!treeIter) {
+        throw std::runtime_error("Invalid iterator type.");
+    }
+    return treeIter->isLastChild();
 }
